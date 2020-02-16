@@ -17,9 +17,12 @@ module.exports = (sequelize, DataTypes) => {
     schedule.findAll()
     .then((items) => {
       items.forEach( row => {
-        SCHEDULES[row.id] = nodeschedule.scheduleJob(row.scheduleStr,( ) => {
-          console.log("Publishing message:", row.topic, row.message);
-          mqtt.client.publish(row.topic, row.message);
+        if(row.active){
+          SCHEDULES[row.id] = nodeschedule.scheduleJob(row.scheduleStr,( ) => {
+            console.log("Publishing message:", row.topic, row.message);
+            mqtt.client.publish(row.topic, row.message);
+          });
+        }
     });
   });
 
