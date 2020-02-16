@@ -8,6 +8,7 @@ require('dotenv').config();
 const mqtt = require('./lib/mqtt');
 const users = require('./routes/users');
 const schedules = require('./routes/schedules');
+const relays = require('./routes/relays');
 
 const app = express();
 
@@ -19,5 +20,6 @@ app.use(cookieParser())
 
 app.use('/api/v1/users', users);
 app.use('/api/v1/schedules', schedules);
+app.use('/api/v1/relays', relays);
 
 module.exports = app;
