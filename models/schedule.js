@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     .then((items) => {
       items.forEach( row => {
         SCHEDULES[row.id] = nodeschedule.scheduleJob(row.scheduleStr,( ) => {
+          console.log("Publishing message:", row.topic, row.message);
           mqtt.client.publish(row.topic, row.message);
     });
   });
