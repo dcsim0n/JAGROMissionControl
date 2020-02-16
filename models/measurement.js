@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     time: DataTypes.DATE
   }, {});
   measurement.associate = function(models) {
-    // associations can be defined here
+    measurement.belongsTo(models.nodemcu);
   };
   return measurement;
 };

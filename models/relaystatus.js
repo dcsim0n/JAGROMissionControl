@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     status: DataTypes.INTEGER
   }, {});
   relaystatus.associate = function(models) {
-    // associations can be defined here
+    relaystatus.belongsTo(models.nodemcu);
   };
   return relaystatus;
 };

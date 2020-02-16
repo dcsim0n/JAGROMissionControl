@@ -6,7 +6,8 @@ module.exports = (sequelize, DataTypes) => {
     numOfSensors: DataTypes.INTEGER
   }, {});
   nodemcu.associate = function(models) {
-    // associations can be defined here
+    nodemcu.hasMany(models.measurement);
+    nodemcu.hasMany(models.relaystatus);
   };
   return nodemcu;
 };
