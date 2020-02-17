@@ -23,8 +23,9 @@ module.exports = (sequelize, DataTypes) => {
             mqtt.client.publish(row.topic, row.message);
           });
         }
+      });
     });
-  });
+  }
 
   schedule.deleteSchedule = function( id ){
     SCHEDULES[id].cancel();
@@ -34,10 +35,9 @@ module.exports = (sequelize, DataTypes) => {
       row.destroy();
     });
   }
-});
-  }
+
   schedule.associate = function(models) {
     // associations can be defined here
   };
   return schedule;
-};
+}
