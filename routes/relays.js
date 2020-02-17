@@ -4,7 +4,7 @@ const models = require('../models');
 
 router.get('/', function(req, res){
   models.relaystatus.findAll()
-  .then( rows => {
+  .spread( rows => {
     res.json(rows);
   })
 })

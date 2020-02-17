@@ -6,10 +6,15 @@ const models = require('../models');
 
 models.schedule.initialize();
 
-router.get('/', function(req, req){
-  models.schedule.findAll()
-  .then( rows => {
-    req.json(rows);
+router.get('/', function(req, res){
+
+  models.schedule.findAll({ attributes: [ 'id', 'scheduleStr', 'topic', 'message', 'active']})
+  .then((rows) => {
+    console.log(req.query);
+    if (req.query['reload']=='true'){
+      models.schedule.reload();
+    }
+    return res.json(rows);
   })
 })
 
@@ -18,8 +23,24 @@ router.post('/', function(req, res){
     assert(req.body.scheduleStr,"Missing sechdule string argument")
     assert(req.body.topic,"Missing topic string argument")
     assert(req.body.message,"Missing message string argument")
+    
+    models.schedule.create({
+      scheduleStr: req.body.scheduleStr,
+      topic: req.body.topic,
+      message: req.body.message,
+      active: req.body.active 
+    })
+    .then(( sched ) => {
+      models.schedule.addSchedule(sched);
+      res.status(200).json("OK");
+    })
+    .catch( err => {
+      console.error(err);
+      res.status(500).json(err);
+    })
   } catch (error) {
     res.status = 422;
+    console.error("schedule creation failed");
     res.json({error: "Unable to create schedule"});
   }
 })
