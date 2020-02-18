@@ -8,26 +8,30 @@ const assert = require('assert');
 const MESSAGE_OPTIONS = { qos: 1 };
 
 function scheduleOne( sched ){
-  assert(sched.id, "Missing ID for new schedule");
-  SCHEDULES[sched.id] = nodeschedule.scheduleJob(`Schedule: ${sched.id}`,sched.scheduleStr, function( ){
+  assert(sched.id != undefined, "Missing ID for new schedule");
+  
+  const job = nodeschedule.scheduleJob(`Schedule: ${sched.id}`,sched.scheduleStr, function( ){
         console.log("Publishing message:", sched.topic, sched.message);
         mqtt.client.publish(sched.topic, sched.message, MESSAGE_OPTIONS);
-  });
+      });
+  
+  assert(job,"Failed creating new job!");
+  console.log("Loaded: ", job.name);
+  SCHEDULES[sched.id] = job;
 }
 
 function scheduleAll( scheds ){
   // cancel all current jobs and re-build SCHEDULES from new
 
   assert(scheds.length != undefined, "Missing length property for schedules argument");
-
-  schedKeys = Object.keys(SCHEDULES);
+  const schedKeys = Object.keys(SCHEDULES);
+  console.log("Active schedules: ",schedKeys);
   // cancel all jobs and throw away the keys
-  if(schedKeys.length > 0 ){
-    for(let i = 0; i < schedKeys.length; i ++){
-      SCHEDULES[i].cancel()
-      delete SCHEDULES[i];
-    }
-  }
+  schedKeys.forEach( key => {
+    console.log("canceling schedule", key)
+    SCHEDULES[key].cancel();
+    delete SCHEDULES[key];
+  })
 
   //Initialize each job
   scheds.forEach( sched => {

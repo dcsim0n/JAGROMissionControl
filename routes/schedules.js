@@ -19,11 +19,11 @@ router.get('/', function(req, res){
 })
 
 router.post('/', function(req, res){
-
+  try{
     assert(req.body.scheduleStr,"Missing sechdule string argument")
     assert(req.body.topic,"Missing topic string argument")
     assert(req.body.message,"Missing message string argument")
-    
+  
     models.schedule.create({
       scheduleStr: req.body.scheduleStr,
       topic: req.body.topic,
@@ -35,9 +35,13 @@ router.post('/', function(req, res){
       res.status(200).json("OK");
     })
     .catch( err => {
+      console.log("\n\n")
       console.error(err);
       res.status(422).json(err);
     })
+  }catch(err){
+    res.status(500).json(err);
+  }
 })
 
 module.exports = router;
