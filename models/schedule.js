@@ -28,7 +28,7 @@ function scheduleAll( scheds ){
   console.log("Active schedules: ",schedKeys);
   // cancel all jobs and throw away the keys
   schedKeys.forEach( key => {
-    console.log("canceling schedule", key)
+    console.log("canceling schedule", key);
     SCHEDULES[key].cancel();
     delete SCHEDULES[key];
   })
