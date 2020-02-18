@@ -1,6 +1,6 @@
 {
   "name": "JAGROMissionControl",
-  "version": "0.0.0",
+  "version": "1.5.7",
   "private": true,
   "scripts": {
     "start": "node ./bin/www"

@@ -5,7 +5,7 @@ const nodeschedule = require('node-schedule');
 const mqtt = require('../lib/mqtt');
 const assert = require('assert');
 
-const MESSAGE_OPTIONS = { qos: 1 };
+const MESSAGE_OPTIONS = { qos: process.env.SCHEDULE_QOS };
 
 function scheduleOne( sched ){
   assert(sched.id != undefined, "Missing ID for new schedule");
