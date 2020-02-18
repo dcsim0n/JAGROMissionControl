@@ -3,10 +3,41 @@
 const SCHEDULES= {}
 const nodeschedule = require('node-schedule');
 const mqtt = require('../lib/mqtt');
+const assert = require('assert');
 
-const REFRESH_RATE = 3000;
+const MESSAGE_OPTIONS = { qos: 1 };
 
-// Load all schedules from DB into memory
+function scheduleOne( sched ){
+  assert(sched.id, "Missing ID for new schedule");
+  SCHEDULES[sched.id] = nodeschedule.scheduleJob(`Schedule: ${sched.id}`,sched.scheduleStr, function( ){
+        console.log("Publishing message:", sched.topic, sched.message);
+        mqtt.client.publish(sched.topic, sched.message, MESSAGE_OPTIONS);
+  });
+}
+
+function scheduleAll( scheds ){
+  // cancel all current jobs and re-build SCHEDULES from new
+
+  assert(scheds.length != undefined, "Missing length property for schedules argument");
+
+  schedKeys = Object.keys(SCHEDULES);
+  // cancel all jobs and throw away the keys
+  if(schedKeys.length > 0 ){
+    for(let i = 0; i < schedKeys.length; i ++){
+      SCHEDULES[i].cancel()
+      delete SCHEDULES[i];
+    }
+  }
+
+  //Initialize each job
+  scheds.forEach( sched => {
+    if(sched.active){
+      scheduleOne( sched );      
+    }
+  });
+
+  console.log(`Canceled ${schedKeys.length} Jobs. Loaded ${scheds.length} Jobs`)
+}
 module.exports = (sequelize, DataTypes) => {
   const schedule = sequelize.define('schedule', {
     scheduleStr: DataTypes.STRING,
@@ -17,43 +48,18 @@ module.exports = (sequelize, DataTypes) => {
 
   schedule.initialize = function( ){
     schedule.findAll()
-    .then((items) => {
-      items.forEach( row => {
-        if(row.active){
-          SCHEDULES[row.id] = nodeschedule.scheduleJob(row.scheduleStr,( ) => {
-            console.log("Publishing message:", row.topic, row.message);
-            mqtt.client.publish(row.topic, row.message);
-          });
-        }
-        console.log("Schedules loaded: ", SCHEDULES);
-      });
+    .then(( scheds ) => {
+      scheduleAll( scheds );
     });
   }
 
-  schedule.addSchedule = function( sched ){
-    SCHEDULES[sched.id] = nodeschedule.scheduleJob(sched.scheduleStr, ( ) => {
-      console.log("Publishing message: ", sched.topic, sched.message);
-      mqtt.client.publish(sched.topic, sched.message);
-    });
-  }
-  // Rereshing schedules on a regular basis
-  // Could cause schedules to be missed
-  // Needs testing
+  schedule.addSchedule = scheduleOne;
+  
   schedule.reload = function (){
-    console.log("Reloading schedules");
+    console.log("Reloading schedules...");
     schedule.findAll()
-    .then((items) => {
-      items.forEach((row) => {
-        // Refresh the schedule for each job
-        if(SCHEDULES[row.id]){
-          SCHEDULES[row.id].reschedule(row.scheduleStr);
-        }else{
-          SCHEDULES[row.id] = nodeschedule.scheduleJob(row.scheduleStr, ( ) => {
-            console.log("Publishing message: ", row.topic, row.message);
-            mqtt.client.publish(row.topic, row.message);
-          });
-        }
-      });
+    .then(( scheds ) => {
+      scheduleAll( scheds );
     });
   }
 

@@ -19,7 +19,7 @@ router.get('/', function(req, res){
 })
 
 router.post('/', function(req, res){
-  try {
+
     assert(req.body.scheduleStr,"Missing sechdule string argument")
     assert(req.body.topic,"Missing topic string argument")
     assert(req.body.message,"Missing message string argument")
@@ -36,13 +36,8 @@ router.post('/', function(req, res){
     })
     .catch( err => {
       console.error(err);
-      res.status(500).json(err);
+      res.status(422).json(err);
     })
-  } catch (error) {
-    res.status = 422;
-    console.error("schedule creation failed");
-    res.json({error: "Unable to create schedule"});
-  }
 })
 
 module.exports = router;
