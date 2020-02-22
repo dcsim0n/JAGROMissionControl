@@ -44,4 +44,16 @@ router.post('/', function(req, res){
   }
 })
 
+router.delete('/:scheduleId', ( req, res ) =>{
+  models.schedule.findByPk(req.params.seheduleId)
+  .then( sched => {
+    sched.destroy();
+    res.json("OK")
+  })
+  .catch( err => {
+    console.error( err );
+    res.status(500).json(err);
+  })
+})
+
 module.exports = router;
