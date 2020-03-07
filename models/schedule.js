@@ -5,6 +5,9 @@ const nodeschedule = require('node-schedule');
 const mqtt = require('../lib/mqtt');
 const assert = require('assert');
 
+// Quality of service for message delivery
+// 0 = no guarantee
+// 1 = guaranteed at least once
 const MESSAGE_OPTIONS = { qos: process.env.SCHEDULE_QOS };
 
 function scheduleOne( sched ){
