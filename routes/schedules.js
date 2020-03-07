@@ -20,7 +20,7 @@ router.get('/', function(req, res){
 
 router.post('/', function(req, res){
   try{
-    assert(req.body.scheduleStr,"Missing sechdule string argument")
+    assert(req.body.scheduleStr,"Missing schedule string argument")
     assert(req.body.topic,"Missing topic string argument")
     assert(req.body.message,"Missing message string argument")
   
@@ -45,7 +45,7 @@ router.post('/', function(req, res){
 })
 
 router.delete('/:scheduleId', ( req, res ) =>{
-  models.schedule.findByPk(req.params.seheduleId)
+  models.schedule.findByPk(req.params.scheduleId)
   .then( sched => {
     sched.destroy();
     res.json("OK")
