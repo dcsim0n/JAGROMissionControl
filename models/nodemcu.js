@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
   nodemcu.associate = function(models) {
     nodemcu.hasMany(models.measurement);
     nodemcu.hasMany(models.relaystatus);
+    nodemcu.hasMany(models.trigger);
   };
   return nodemcu;
 };

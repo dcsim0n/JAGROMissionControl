@@ -29,7 +29,16 @@ Nodes are physicla NodeMCU processors that are connected to sensors and relays
 + Value
 + Date & Time
 
+## Trigger
++ sensorNum  
++ trend direction: ( rising, falling )
++ correction amount
++ trigger value
++ smoothing window
+
 # User Stories
 + Users can view current output from sensors in near realtime
 + Users can view historical output from sensors
 + Users can configure a schedule to control devices like lighting, water pumps, and air flow / heating
++ Users can define triggers that will become active when certain sensor conditions are met.
++ Triggers will execute pre-defined events when activated
