@@ -45,7 +45,7 @@ router.post('/', function(req, res){
 })
 
 router.delete('/:scheduleId', ( req, res ) =>{
-  models.schedule.deleteSchedule ( req.params.scheduleId )
+  models.schedule.deleteSchedule( req.params.scheduleId )
   .then( () =>{
     res.json("OK");
   })

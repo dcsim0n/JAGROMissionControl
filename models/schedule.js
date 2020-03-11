@@ -73,9 +73,10 @@ module.exports = (sequelize, DataTypes) => {
   schedule.deleteSchedule = function( id ){
     SCHEDULES[id].cancel();
     delete SCHEDULES[id]; //clear references
-    schedule.findOne(id)
+    return schedule.findByPk(id)
     .then( row => {
-      row.destroy();
+      console.log("Canceling schedule #: ", id);
+      return row.destroy();
     });
   }
 
