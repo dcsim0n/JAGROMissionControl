@@ -1,6 +1,6 @@
 {
   "name": "JAGROMissionControl",
-  "version": "1.5.7",
+  "version": "1.7.0",
   "private": true,
   "scripts": {
     "start": "node_modules/.bin/nodemon ./bin/www"
