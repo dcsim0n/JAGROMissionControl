@@ -12,7 +12,7 @@ const users = require('./routes/users');
 const schedules = require('./routes/schedules');
 const relays = require('./routes/relays');
 const measurements = require('./routes/measurements');
-
+const triggers = require('./routes/triggers');
 const app = express();
 
 const blynkClient = blynk.start();

@@ -1,21 +1,33 @@
 
 
 const { Op } = require('sequelize');
+const assert = require('assert');
 
 const TRIGGERS = {};
 const TRIGGER_CHECK_INTERVAL = 5000;
 
 function buildTrigger( trigger ){
   TRIGGERS[ trigger.id ] = setInterval(()=>{
-    trigger.getNodemcu()
-    .then( mcu => {
-      mcu.getMeasurements( { where: { sensorNum: trigger.sensorNum } })
-    })
     // collect all measurements that are inside of the smoothing / averaging window
+    trigger.getWindowedValues()
     // calculate the average
-    // if the average meets the trigger value 
-    // ( greater than or less than based on direction )
-    // send the appropriate command
+    .then( measurements => {
+      assert(measurements.length > 0 , "Unable to calculate trigger without any measurements, maybe adjust value of smoothing window!")
+      const sumValue = measurements.reduce( ( t, m ) => t += m.value, 0 ) // total all measurement values
+      const avgValue = sumValue / measurements.length;
+      // if the average meets the trigger value 
+      // ( greater than or less than based on direction )
+      console.log("Trigger: ", trigger.id, ", Trigger value: ", trigger.triggerValue, ", Current Value: ", avgValue, ", Window total: ", sumValue );
+      if( trigger.direction === 'rising' && avgValue > trigger.triggerValue ){
+        console.log("RISING trigger condition met! send a message");
+      }
+      if( trigger.direction === 'falling' && avgValue < trigger.triggerValue ){
+        console.log("FALLING trigger condition met! send a message");
+      }
+    })
+    .catch( error => {
+      console.log( error );
+    });
   }, TRIGGER_CHECK_INTERVAL)
 }
 
@@ -69,9 +81,13 @@ module.exports = (sequelize, DataTypes) => {
   }
 
   trigger.initialize = function ( ){
-    trigger.findAll({ include: nodemcu })
+    trigger.findAll({ include: 'nodemcu' })
     .then( triggers => {
       // initialize each trigger into application memory
+      triggers.forEach( trigger =>{
+        buildTrigger( trigger );
+        console.log("Initialized triggers: ", Object.keys(TRIGGERS).length );
+      })
     })
   }
   return trigger;
