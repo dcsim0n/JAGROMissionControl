@@ -97,8 +97,8 @@ module.exports = (sequelize, DataTypes) => {
       // initialize each trigger into application memory
       triggers.forEach( trigger =>{
         buildTrigger( trigger );
-        console.log("Initialized triggers: ", Object.keys(TRIGGERS).length );
       })
+      console.log("Initialized triggers: ", Object.keys(TRIGGERS).length );
     })
   }
 
@@ -114,5 +114,13 @@ module.exports = (sequelize, DataTypes) => {
 
   trigger.addTrigger = buildTrigger;
 
+  trigger.deleteTrigger = function( id ){
+    clearInterval(TRIGGERS[id]);
+    delete TRIGGERS[id];
+    return trigger.findByPk( id )
+    .then( row =>{
+      return row.destroy();
+    })
+  }
   return trigger;
 }

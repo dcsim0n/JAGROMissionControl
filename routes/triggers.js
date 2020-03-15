@@ -38,4 +38,15 @@ router.post('/', function( req, res ){
   })
 })
 
+router.delete('/:triggerId', function( req, res ){
+  models.trigger.deleteTrigger( req.params.triggerId ) 
+  .then( ()=>{
+    res.json("OK");
+  })
+  .catch( error =>{
+    console.log(error);
+    res.status(500).json(error);
+  })
+})
+
 module.exports = router
