@@ -19,7 +19,17 @@ router.get('/', function( req, res ){
 })
 
 router.post('/', function( req, res ){
-  const { triggerValue, topic, message, sensorNum, nodemcuId, smoothingWindow, direction } = req.body;
+  const {
+    triggerValue,
+    topic,
+    message,
+    sensorNum,
+    nodemcuId,
+    smoothingWindow,
+    direction, 
+    description
+  } = req.body;
+  
   models.trigger.create({
     triggerValue,
     topic,
@@ -28,7 +38,8 @@ router.post('/', function( req, res ){
     nodemcuId,
     smoothingWindow,
     direction,
-    active: false
+    active: false,
+    description
   })
   .then( () =>{
     res.json("OK");

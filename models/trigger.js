@@ -2,10 +2,15 @@
 
 const { Op } = require('sequelize');
 const assert = require('assert');
+const mqtt = require('../lib/mqtt');
 
 const TRIGGERS = {};
 const TRIGGER_CHECK_INTERVAL = 5000;
+const MESSAGE_OPTIONS = { qos: process.env.SCHEDULE_QOS };
 
+function sendTriggerMessage(trigger){
+
+}
 function buildTrigger( trigger ){
   TRIGGERS[ trigger.id ] = setInterval(()=>{
     // collect all measurements that are inside of the smoothing / averaging window
@@ -51,7 +56,8 @@ module.exports = (sequelize, DataTypes) => {
     correction: DataTypes.FLOAT,
     topic: DataTypes.STRING,
     message: DataTypes.STRING,
-    active: DataTypes.BOOLEAN
+    active: DataTypes.BOOLEAN,
+    description: DataTypes.STRING
   }, {});
  
   trigger.associate = function ( models ){
