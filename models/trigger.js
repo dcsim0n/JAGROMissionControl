@@ -22,9 +22,17 @@ function buildTrigger( trigger ){
         console.log("RISING trigger condition met! send a message");
         trigger.update({active: true })
       }
+      if( (trigger.direction === 'rising') && (avgValue <= trigger.triggerValue) && (trigger.active) ){
+        console.log("RISING trigger condition within bounds! ");
+        trigger.update({active: false })
+      }
       if( (trigger.direction === 'falling') && (avgValue < trigger.triggerValue) && (!trigger.active) ){
         console.log("FALLING trigger condition met! send a message");
         trigger.update({active: true });
+      }
+      if( (trigger.direction === 'falling') && (avgValue >= trigger.triggerValue) && (trigger.active) ){
+        console.log("FALLING trigger condition met! send a message");
+        trigger.update({active: false });
       }
     })
     .catch( error => {
@@ -53,13 +61,13 @@ module.exports = (sequelize, DataTypes) => {
   trigger.prototype.getWindowedValues = function(){
     // Build date objects that cover the smoothing window
     const startWindowTime = new Date();
-    const endWindowTime = Object.assign( startWindowTime ); // Make copy of start time
+    const endWindowTime = new Date(); // Object.assign( startWindowTime, {}); // Make copy of start time
     endWindowTime.setMinutes( startWindowTime.getMinutes() - this.smoothingWindow ) // Calculate the date object for x minutes ago
     
     // Find all measurements with nodemcuID and sensorNum
     return this.getNodemcu()
     .then( mcu => {
-      if(this.smoothingWindow === 0 ){
+      if(this.smoothingWindow === 0){
         // If window = 0, just return the last measurement
         return mcu.getMeasurements({ 
           limit: 1, 
@@ -70,7 +78,7 @@ module.exports = (sequelize, DataTypes) => {
         return mcu.getMeasurements({
           where: { [Op.and]: [
             { sensorNum: this.sensorNum },
-            { time: {[Op.between]: [startWindowTime, endWindowTime]}}
+            { time: {[Op.between]: [endWindowTime, startWindowTime]}}
           ]},
           order: [['time', 'DESC']]
         })
@@ -83,8 +91,8 @@ module.exports = (sequelize, DataTypes) => {
 
   }
 
-  trigger.initialize = function ( ){
-    trigger.findAll({ include: 'nodemcu' })
+  trigger.initialize = function(){
+    return trigger.findAll({ include: 'nodemcu' })
     .then( triggers => {
       // initialize each trigger into application memory
       triggers.forEach( trigger =>{
@@ -93,5 +101,18 @@ module.exports = (sequelize, DataTypes) => {
       })
     })
   }
+
+  trigger.reload = function(){
+    // cancel every trigger and reload
+    Object.keys(TRIGGERS).forEach( key => {
+      console.log("Clearing trigger: ", key);
+      clearInterval(TRIGGERS[key]);
+    });
+    // load triggers from database again
+    trigger.initialize();
+  }
+
+  trigger.addTrigger = buildTrigger;
+
   return trigger;
 }

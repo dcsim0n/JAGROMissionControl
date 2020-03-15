@@ -27,5 +27,6 @@ app.use('/api/v1/users', users);
 app.use('/api/v1/schedules', schedules);
 app.use('/api/v1/relays', relays);
 app.use('/api/v1/measurements',measurements);
+app.use('/api/v1/triggers',triggers);
 
 module.exports = app;

@@ -5,10 +5,17 @@ const models = require('../models');
 models.trigger.initialize();
 
 router.get('/', function( req, res ){
+  
   models.trigger.findAll()
   .then( triggers =>{
+    if(req.query.reload == 'true'){
+      models.trigger.reload();
+    }
     res.json(triggers);
   }) 
+  .catch( error =>{
+    res.status(500).json({ "error": error })
+  })
 })
 
 router.post('/', function( req, res ){
@@ -19,11 +26,16 @@ router.post('/', function( req, res ){
     message,
     sensorNum,
     nodemcuId,
-    smoothingWindow
+    smoothingWindow,
+    direction,
+    active: false
   })
   .then( () =>{
     res.json("OK");
   })
+  .catch( error =>{
+    res.status(422).json({"error": error });
+  })
 })
 
-module.export = router
+module.exports = router
