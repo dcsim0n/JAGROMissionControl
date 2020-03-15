@@ -17,12 +17,14 @@ function buildTrigger( trigger ){
       const avgValue = sumValue / measurements.length;
       // if the average meets the trigger value 
       // ( greater than or less than based on direction )
-      console.log("Trigger: ", trigger.id, ", Trigger value: ", trigger.triggerValue, ", Current Value: ", avgValue, ", Window total: ", sumValue );
-      if( trigger.direction === 'rising' && avgValue > trigger.triggerValue ){
+      console.log("Trigger: ", trigger.id, ", Active?: ", trigger.active, ", Trigger value: ", trigger.triggerValue, ", Current Value: ", avgValue, ", Window total: ", sumValue );
+      if( (trigger.direction === 'rising') && (avgValue > trigger.triggerValue) && (!trigger.active) ){
         console.log("RISING trigger condition met! send a message");
+        trigger.update({active: true })
       }
-      if( trigger.direction === 'falling' && avgValue < trigger.triggerValue ){
+      if( (trigger.direction === 'falling') && (avgValue < trigger.triggerValue) && (!trigger.active) ){
         console.log("FALLING trigger condition met! send a message");
+        trigger.update({active: true });
       }
     })
     .catch( error => {
@@ -41,6 +43,7 @@ module.exports = (sequelize, DataTypes) => {
     correction: DataTypes.FLOAT,
     topic: DataTypes.STRING,
     message: DataTypes.STRING,
+    active: DataTypes.BOOLEAN
   }, {});
  
   trigger.associate = function ( models ){
