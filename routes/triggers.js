@@ -19,7 +19,17 @@ router.get('/', function( req, res ){
 })
 
 router.post('/', function( req, res ){
-  const { triggerValue, topic, message, sensorNum, nodemcuId, smoothingWindow, direction } = req.body;
+  const {
+    triggerValue,
+    topic,
+    message,
+    sensorNum,
+    nodemcuId,
+    smoothingWindow,
+    direction, 
+    description
+  } = req.body;
+  
   models.trigger.create({
     triggerValue,
     topic,
@@ -28,13 +38,16 @@ router.post('/', function( req, res ){
     nodemcuId,
     smoothingWindow,
     direction,
-    active: false
+    active: false,
+    description
   })
-  .then( () =>{
+  .then( ( trigger ) =>{
+    models.trigger.addTrigger(trigger);
     res.json("OK");
   })
   .catch( error =>{
-    res.status(422).json({"error": error });
+    console.log(error);
+    res.status(422).json("Unable to add new trigger");
   })
 })
 
@@ -45,7 +58,7 @@ router.delete('/:triggerId', function( req, res ){
   })
   .catch( error =>{
     console.log(error);
-    res.status(500).json(error);
+    res.status(500).json(`Error removing trigger: ${ req.params.triggerId }`);
   })
 })
 

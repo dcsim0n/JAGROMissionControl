@@ -2,9 +2,12 @@
 
 const { Op } = require('sequelize');
 const assert = require('assert');
+const mqtt = require('../lib/mqtt');
 
 const TRIGGERS = {};
 const TRIGGER_CHECK_INTERVAL = 5000;
+const MESSAGE_OPTIONS = { qos: process.env.SCHEDULE_QOS };
+
 
 function buildTrigger( trigger ){
   TRIGGERS[ trigger.id ] = setInterval(()=>{
@@ -19,19 +22,21 @@ function buildTrigger( trigger ){
       // ( greater than or less than based on direction )
       console.log("Trigger: ", trigger.id, ", Active?: ", trigger.active, ", Trigger value: ", trigger.triggerValue, ", Current Value: ", avgValue, ", Window total: ", sumValue );
       if( (trigger.direction === 'rising') && (avgValue > trigger.triggerValue) && (!trigger.active) ){
-        console.log("RISING trigger condition met! send a message");
+        console.log("RISING trigger bounds exceeded! send a message");
+        trigger.sendTriggerMessage();
         trigger.update({active: true })
       }
       if( (trigger.direction === 'rising') && (avgValue <= trigger.triggerValue) && (trigger.active) ){
-        console.log("RISING trigger condition within bounds! ");
+        console.log("RISING trigger condition satisfied, deactivating");
         trigger.update({active: false })
       }
       if( (trigger.direction === 'falling') && (avgValue < trigger.triggerValue) && (!trigger.active) ){
-        console.log("FALLING trigger condition met! send a message");
+        console.log("FALLING trigger bounds exceeded! send a message");
+        trigger.sendTriggerMessage();
         trigger.update({active: true });
       }
       if( (trigger.direction === 'falling') && (avgValue >= trigger.triggerValue) && (trigger.active) ){
-        console.log("FALLING trigger condition met! send a message");
+        console.log("FALLING trigger condition satisfied! deactivating");
         trigger.update({active: false });
       }
     })
@@ -51,7 +56,8 @@ module.exports = (sequelize, DataTypes) => {
     correction: DataTypes.FLOAT,
     topic: DataTypes.STRING,
     message: DataTypes.STRING,
-    active: DataTypes.BOOLEAN
+    active: DataTypes.BOOLEAN,
+    description: DataTypes.STRING
   }, {});
  
   trigger.associate = function ( models ){
@@ -90,7 +96,11 @@ module.exports = (sequelize, DataTypes) => {
     })
 
   }
-
+  
+  trigger.prototype.sendTriggerMessage = function sendTriggerMessage(){
+    mqtt.client.publish( this.topic, this.message, MESSAGE_OPTIONS );
+  }
+ 
   trigger.initialize = function(){
     return trigger.findAll({ include: 'nodemcu' })
     .then( triggers => {
