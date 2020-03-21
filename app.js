@@ -15,7 +15,9 @@ const measurements = require('./routes/measurements');
 const triggers = require('./routes/triggers');
 const app = express();
 
-const blynkClient = blynk.start();
+//Only connect to Blynk if we have a valid token
+process.env.BLYNK_TOKEN != "" && blynk.start();
+
 mqtt.start();
 
 app.use(cors());
