@@ -3,34 +3,24 @@
 | Dana Simmons 2020
 */
 
+const events = require('events');
 
-const HANDLERS = {};
 
-class Blynk {
-  constructor(token){
-    //console.log("Using token:", token)
-    //this.activeUserId = 'me'; //must pass this as part of the even
-  }
-  
-  on(eventName, handler){ 
-    // Add handlers for new events
-    HANDLERS[eventName] = jest.fn(handler);
-  }
-  sendMessage( ){
-    //not needed right now
-  }
 
+class Blynk extends events.EventEmitter {
+
+  connect(){
+    console.log("Connecting...");
+  }
+  disconnect(){
+    console.log("Disconnecting...");
+  }
   VirtualPin(num){
-    
+    const pin = new event.EventEmitter()
+    pin.write = jest.fn();
+    return pin;
   }
 
 }
-Blynk.HANDLERS = HANDLERS;
-Blynk.fire = jest.fn((eventName, event)=>{
-  console.log("Fire event: ", eventName);
-  console.log("Firing with: ", event);
-
-  return HANDLERS[eventName](event);
-});
 
 module.exports = Blynk;
