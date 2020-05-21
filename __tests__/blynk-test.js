@@ -67,6 +67,6 @@ describe('button pins respond to \'write\' event', ( ) => {
   test('Buttons trigger the correct relay message and data', ( ) =>{
     b1.emit('write', 1);
     expect(mqttMock.client.publish.mock.calls[1][0]).toBe("jagro/JAGRO1/relay/1");
-    expect(mqttMock.client.publish.mock.calls[1][1]).toBe(1);
+    expect(mqttMock.client.publish.mock.calls[1][1]).toBe("1");
   })
 })
