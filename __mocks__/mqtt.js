@@ -4,9 +4,11 @@
  * 
  */
 const MQTTMOCK = {
-  client : {
-    publish: jest.fn();
-  }
+  connect: jest.fn( ()=>{
+    return { // the client object
+      publish: jest.fn(console.log)
+    }
+  })
 }
 
 module.exports = MQTTMOCK;
