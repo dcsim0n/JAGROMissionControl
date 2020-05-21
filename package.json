@@ -3,7 +3,8 @@
   "version": "1.8.0",
   "private": true,
   "scripts": {
-    "start": "node_modules/.bin/nodemon ./bin/www"
+    "start": "node_modules/.bin/nodemon ./bin/www",
+    "test": "node_modules/.bin/jest"
   },
   "dependencies": {
     "async-mqtt": "^2.5.0",
