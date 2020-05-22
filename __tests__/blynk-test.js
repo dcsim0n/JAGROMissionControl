@@ -1,12 +1,12 @@
 /*
-* Blynk Unit Test
+* JAGRO Blynk Unit Tests
 * Dana Simmons 2020
 *
 */
 
 const blynk = require('../lib/blynk');
-const mqtt = require('mqtt');
-const mqttMock = require('../lib/mqtt');
+const mqttMock = require('mqtt');
+const mqtt = require('../lib/mqtt');
 const models = require('../models');
 
 describe('Blynk has a client', ()=> {
@@ -44,7 +44,7 @@ describe('Virtual pins return data when read', ()=>{
     v1.emit('read', callbackTest );
   })
 
-  test('v1.write() sends correct data', ( )=>{
+  test('v1.write() sends correct data', ( done )=>{
     
     const callbackTest = ( )=>{
       expect(v1.write).toHaveBeenCalledWith(42);
@@ -61,12 +61,12 @@ describe('button pins respond to \'write\' event', ( ) => {
 
   test('Buttons publish a message for state changes', ( )=>{
     b1.emit('write',1);
-    expect(mqttMock.client.publish).toHaveBeenCalled();
+    expect(mqtt.client.publish).toHaveBeenCalled();
   })
 
   test('Buttons trigger the correct relay message and data', ( ) =>{
     b1.emit('write', 1);
-    expect(mqttMock.client.publish.mock.calls[1][0]).toBe("jagro/JAGRO1/relay/1");
-    expect(mqttMock.client.publish.mock.calls[1][1]).toBe("1");
+    expect(mqtt.client.publish.mock.calls[1][0]).toBe("jagro/JAGRO1/relay/1");
+    expect(mqtt.client.publish.mock.calls[1][1]).toBe("1");
   })
 })
