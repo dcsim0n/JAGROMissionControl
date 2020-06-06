@@ -38,10 +38,49 @@ describe('JAGRO subscribes when connected', ( )=>{
     })
 })
 
-describe('JAGRO reacts to incoming message', () => {
   // test that messages trigger the correct data in the database
+describe('JAGRO reacts to incoming message', () => {
+  afterEach(()=>{
+    models.relaystatus.removeHook('afterUpdate','afterFind');
+    // return models.relaystatus.destroy({truncate:true});
+  });
   // relay status should get updated
+  test("relay status should get updated", (done)=>{
+
+    // clear out all statuses from previous tests
+    models.relaystatus.destroy({truncate: true})
+    .then( ()=>{
+      //send relay status update
+      mqtt.client.emit('message', 'jagro/JAGRO1/relay/1','1');
+      //create hook to fire after the database is updated
+      models.relaystatus.afterUpdate( r =>{
+        models.relaystatus.findOne({where: {uniqueId: 'JAGRO1'}})
+        .then( relay =>{
+          expect(relay.status).toBe(1);
+          done();
+        });
+
+      });
+      
+    });
+
+  });
+  
   // sync message should be processed
+  test("sync messages should be return a response", (done)=>{
+    models.relaystatus.bulkCreate([
+      {uniqueId:'JAGRO1', relayNum: 2, status: 0, nodemcuId:1},
+      {uniqueId:'JAGRO1', relayNum: 3, status: 0, nodemcuId:1},
+      {uniqueId:'JAGRO1', relayNum: 4, status: 0, nodemcuId:1}
+    ])
+    .then(()=>{
+      mqtt.client.emit('message', 'jagro/JAGRO1/sync','');
+      setTimeout(()=>{
+          expect(mqtt.client.publish).toHaveBeenCalledTimes(4);
+          done()
+      }, 3000)
+    })
+  })
   // sensor data should be written
   // unrecognized messages should be handled
 })
