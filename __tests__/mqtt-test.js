@@ -68,6 +68,8 @@ describe('JAGRO reacts to incoming message', () => {
   
   // sync message should be processed
   test("sync messages should be return a response", (done)=>{
+
+    //add some relays
     models.relaystatus.bulkCreate([
       {uniqueId:'JAGRO1', relayNum: 2, status: 0, nodemcuId:1},
       {uniqueId:'JAGRO1', relayNum: 3, status: 0, nodemcuId:1},
@@ -75,13 +77,26 @@ describe('JAGRO reacts to incoming message', () => {
     ])
     .then(()=>{
       mqtt.client.emit('message', 'jagro/JAGRO1/sync','');
+      // not pretty but since the getRelaystatuses() is async, need to wait
+      // for it to return and publish to be called
       setTimeout(()=>{
           expect(mqtt.client.publish).toHaveBeenCalledTimes(4);
-          done()
-      }, 3000)
-    })
-  })
+          done();
+      }, 3000);
+
+    });
+
+  });
+
   // sensor data should be written
-  // unrecognized messages should be handled
+
+  test("sensor data should be recorded", ()=>{
+    // emit sensor message
+    // make sure that the count of records is correct
+  })
+
+  test("unrecognized messages should not cause errors", ()=>{
+
+  })
 })
 
