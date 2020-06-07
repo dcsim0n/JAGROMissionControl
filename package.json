@@ -7,7 +7,7 @@
     "test": "node_modules/.bin/jest",
     "migrate": "node_modules/.bin/sequelize-cli db:migrate"
   },
-  "jest":{
+  "jest": {
     "verbose": true
   },
   "dependencies": {
@@ -20,7 +20,6 @@
     "dotenv": "^8.2.0",
     "express": "~4.13.1",
     "fresh": "0.5.2",
-    "jest": "^26.0.1",
     "mime": "1.4.1",
     "mqtt": "^3.0.0",
     "negotiator": "0.6.1",
@@ -30,5 +29,9 @@
     "sequelize": "^5.21.4",
     "sequelize-cli": "^5.5.1",
     "sqlite3": "^4.1.1"
+  },
+  "devDependencies": {
+    "supertest": "^4.0.2",
+    "jest": "^26.0.1"
   }
 }

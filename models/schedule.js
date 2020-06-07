@@ -83,5 +83,9 @@ module.exports = (sequelize, DataTypes) => {
   schedule.associate = function(models) {
     // associations can be defined here
   };
+
+  // export SCHEDULES object as private member for testing
+  schedule._SCHEDULES = SCHEDULES;
+
   return schedule;
 }
