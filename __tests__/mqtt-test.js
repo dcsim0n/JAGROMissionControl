@@ -40,10 +40,12 @@ describe('JAGRO subscribes when connected', ( )=>{
 
   // test that messages trigger the correct data in the database
 describe('JAGRO reacts to incoming message', () => {
+
   afterEach(()=>{
     models.relaystatus.removeHook('afterUpdate','afterFind');
-    // return models.relaystatus.destroy({truncate:true});
+    return models.measurement.destroy({truncate:true});
   });
+
   // relay status should get updated
   test("relay status should get updated", (done)=>{
 
@@ -82,7 +84,7 @@ describe('JAGRO reacts to incoming message', () => {
       setTimeout(()=>{
           expect(mqtt.client.publish).toHaveBeenCalledTimes(4);
           done();
-      }, 3000);
+      }, 2000);
 
     });
 
@@ -90,8 +92,19 @@ describe('JAGRO reacts to incoming message', () => {
 
   // sensor data should be written
 
-  test("sensor data should be recorded", ()=>{
+  test("sensor data should be recorded", (done)=>{
     // emit sensor message
+    for(let i = 1; i < 6; i++){
+      mqtt.client.emit('message', `jagro/JAGRO1/sensor/${i}`,toString(i));
+    }
+
+    setTimeout(()=>{
+      models.measurement.count()
+      .then( c => {
+        expect(c).toBe(5);
+        done()
+      })
+    },2000)
     // make sure that the count of records is correct
   })
 
